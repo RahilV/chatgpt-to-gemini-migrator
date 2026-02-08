@@ -1,0 +1,19 @@
+# ChatGPT to Gemini Migration Tool
+# No external dependencies required - uses Python standard library only!
+# 
+# Minimum Python version: 3.6
+#
+# All required modules are built-in:
+# - json (for parsing ChatGPT data)
+# - csv (for CSV export)
+# - datetime (for timestamp handling)
+# - pathlib (for file operations)
+# - http.server (for local web server)
+# - webbrowser (for auto-opening browser)
+#
+# To verify your Python version:
+#   python --version
+#
+# To run the tool:
+#   python migrate_to_gemini.py
+#   python view_conversations.py

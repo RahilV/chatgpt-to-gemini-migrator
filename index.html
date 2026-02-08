@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT to Gemini Migration Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --surface-1: #f8f9fa;
+            --surface-2: #ffffff;
+            --on-surface: #202124;
+            --on-surface-variant: #5f6368;
+            --primary: #1a73e8;
+            --primary-hover: #1765cc;
+            --outline: #dadce0;
+            --success: #1e8e3e;
+            --warning: #f9ab00;
+            --accent-blue: #4285f4;
+            --accent-green: #34a853;
+            --accent-yellow: #fbbc04;
+            --accent-red: #ea4335;
+        }
+
+        [data-theme="dark"] {
+            --surface-1: #202124;
+            --surface-2: #292a2d;
+            --on-surface: #e8eaed;
+            --on-surface-variant: #9aa0a6;
+            --primary: #8ab4f8;
+            --primary-hover: #aecbfa;
+            --outline: #5f6368;
+            --success: #81c995;
+            --warning: #fdd663;
+            --accent-blue: #8ab4f8;
+            --accent-green: #81c995;
+            --accent-yellow: #fdd663;
+            --accent-red: #f28b82;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background: var(--surface-1);
+            color: var(--on-surface);
+            line-height: 1.6;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--outline);
+            color: var(--on-surface);
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            transition: all 0.2s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .theme-toggle:hover {
+            background: var(--surface-1);
+        }
+
+        nav {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--outline);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green), var(--accent-yellow), var(--accent-red));
+            border-radius: 50%;
+        }
+
+        .hero {
+            max-width: 800px;
+            margin: 80px auto 60px;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 400;
+            color: var(--on-surface);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            color: var(--on-surface-variant);
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--outline);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        .section {
+            background: var(--surface-2);
+            border-radius: 12px;
+            border: 1px solid var(--outline);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .section h2 {
+            font-size: 28px;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .section p {
+            color: var(--on-surface-variant);
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .steps {
+            display: grid;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 16px;
+            padding: 20px;
+            background: var(--surface-1);
+            border-radius: 8px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .step-content h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .code {
+            background: var(--surface-1);
+            border: 1px solid var(--outline);
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .feature {
+            padding: 24px;
+            background: var(--surface-1);
+            border-radius: 8px;
+            text-align: center;
+            border-top: 3px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .feature:nth-child(1) { border-top-color: var(--accent-blue); }
+        .feature:nth-child(2) { border-top-color: var(--accent-green); }
+        .feature:nth-child(3) { border-top-color: var(--accent-yellow); }
+        .feature:nth-child(4) { border-top-color: var(--accent-red); }
+        .feature:nth-child(5) { border-top-color: var(--accent-blue); }
+        .feature:nth-child(6) { border-top-color: var(--accent-green); }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .feature h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .alert-info {
+            background: #e8f0fe;
+            color: #1967d2;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background: #1e3a5f;
+            color: #8ab4f8;
+        }
+
+        .alert-success {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        [data-theme="dark"] .alert-success {
+            background: #1e3a2e;
+            color: #81c995;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--on-surface-variant);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .section {
+                padding: 24px;
+            }
+            .step {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+    </button>
+
+    <nav>
+        <div class="nav-content">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <span>ChatGPT to Gemini</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Migrate your conversations</h1>
+        <p class="subtitle">Export, convert, and browse your ChatGPT history in a beautiful interface</p>
+        <div class="cta-buttons">
+            <a href="#start" class="btn btn-primary">Get started</a>
+            <a href="https://github.com" class="btn btn-secondary">View on GitHub</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section" id="start">
+            <h2>Quick start</h2>
+            <p>Get up and running in 4 simple steps</p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Export from ChatGPT</h3>
+                        <p>Go to ChatGPT → Settings → Data controls → Export data. Download the ZIP file you receive via email.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Place the file</h3>
+                        <p>Copy <code style="background: var(--surface-2); padding: 2px 6px; border-radius: 4px;">conversations.json</code> to the <strong>input</strong> folder.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Run the migration</h3>
+                        <div class="code">python migrate_to_gemini.py</div>
+                        <p>This converts your conversations to multiple formats.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>View your conversations</h3>
+                        <div class="code">python view_conversations.py</div>
+                        <p>Opens a beautiful viewer at http://localhost:8000</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <span class="alert-icon">ℹ️</span>
+                <div>
+                    <strong>Requirements:</strong> Python 3.6 or higher. Download from <a href="https://python.org" target="_blank" style="color: inherit; font-weight: 500;">python.org</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Features</h2>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Search</h3>
+                    <p>Find any conversation instantly</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Beautiful UI</h3>
+                    <p>Gemini-inspired design</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📝</div>
+                    <h3>Multiple formats</h3>
+                    <p>Markdown, JSON, CSV, HTML</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Private</h3>
+                    <p>100% local processing</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🌓</div>
+                    <h3>Dark mode</h3>
+                    <p>Easy on the eyes</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast</h3>
+                    <p>No dependencies needed</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>What you get</h2>
+            <p>After migration, you'll have a complete archive:</p>
+            <div style="background: var(--surface-1); padding: 20px; border-radius: 8px; border: 1px solid var(--outline);">
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 14px; line-height: 1.8;">
+                    <div style="color: var(--accent-blue); font-weight: 500;">📁 migrated_conversations/</div>
+                    <div style="margin-left: 20px;">
+                        <div style="color: var(--accent-green);">📁 html/</div>
+                        <div style="margin-left: 40px; color: var(--on-surface-variant);">└─ conversation_viewer_v2.html</div>
+                    </div>
+                    <div style="margin-left: 20px;">
+                        <div style="color: var(--accent-green);">📁 markdown/</div>
+                        <div style="margin-left: 40px; color: var(--on-surface-variant);">└─ [one file per conversation]</div>
+                    </div>
+                    <div style="margin-left: 20px;">
+                        <div style="color: var(--accent-green);">📁 json/</div>
+                        <div style="margin-left: 40px; color: var(--on-surface-variant);">└─ all_conversations.json</div>
+                    </div>
+                    <div style="margin-left: 20px;">
+                        <div style="color: var(--accent-green);">📁 csv/</div>
+                        <div style="margin-left: 40px; color: var(--on-surface-variant);">└─ conversation_summary.csv</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Use with Gemini</h2>
+            <p>While Gemini doesn't support direct imports, you can:</p>
+            <ol style="margin-left: 20px; color: var(--on-surface-variant);">
+                <li style="margin-bottom: 8px;">Browse your conversations in the viewer</li>
+                <li style="margin-bottom: 8px;">Copy relevant context from past discussions</li>
+                <li style="margin-bottom: 8px;">Paste into new Gemini chats to continue conversations</li>
+            </ol>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">✓</span>
+            <div>
+                <strong>Privacy first:</strong> All processing happens on your computer. Your data never leaves your device.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Open source • MIT License • No tracking</p>
+        <p style="margin-top: 8px; opacity: 0.7;">Made for the ChatGPT community</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+        
+        function updateThemeButton(theme) {
+            document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+            document.getElementById('themeText').textContent = theme === 'dark' ? 'Light' : 'Dark';
+        }
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeButton(savedTheme);
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
