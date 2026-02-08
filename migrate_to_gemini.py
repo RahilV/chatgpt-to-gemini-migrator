@@ -529,7 +529,13 @@ class ChatGPTMigrator:
             
             // Render messages
             const messagesEl = document.getElementById('messagesContainer');
-            messagesEl.innerHTML = currentConversation.messages.map(msg => {{
+            
+            // Filter out empty messages
+            const validMessages = currentConversation.messages.filter(msg => {{
+                return msg.content && msg.content.trim().length > 0;
+            }});
+            
+            messagesEl.innerHTML = validMessages.map(msg => {{
                 const time = msg.create_time ? new Date(msg.create_time * 1000).toLocaleString() : '';
                 return `
                     <div class="message ${{msg.role}}">
